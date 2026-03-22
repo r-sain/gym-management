@@ -34,7 +34,7 @@ To push this code to your GitHub:
 - **Build Command**: `npm run build`
 - **Output Directory**: `dist`
 - **Env Variables**:
-  - `VITE_API_URL`: `https://your-backend-url.onrender.com/api`
+  - `VITE_API_URL`: `https://gym-management-opnz.onrender.com/api`
 
 ## 🛠️ Tech Stack
 - **Frontend**: React, TailwindCSS, Axios
