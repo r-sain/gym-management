@@ -6,18 +6,18 @@ const sendWhatsAppReminder = (user) => {
   const phoneNumber = `91${user.phone}`; // Assuming +91 for India
   const diffTime = new Date(user.plan?.endDate).getTime() - new Date().getTime();
   const rawDaysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   let dayText = '';
   if (rawDaysLeft < 0) dayText = 'expired';
   else if (rawDaysLeft === 0) dayText = 'expiring today';
   else dayText = `expiring in ${rawDaysLeft} days`;
 
   const message = `Hi *${user.name}*, this is a reminder from *Akhara Gym*. Your membership is *${dayText}*. Please visit the gym to renew your plan!`;
-  
+
   const encodedMessage = encodeURIComponent(message);
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const waUrl = isMobile 
-    ? `https://wa.me/${phoneNumber}?text=${encodedMessage}` 
+  const waUrl = isMobile
+    ? `https://wa.me/${phoneNumber}?text=${encodedMessage}`
     : `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
 
   window.open(waUrl, '_blank');
@@ -35,7 +35,7 @@ const UserTable = ({ users, onRenew, onDelete }) => {
           aValue = new Date(a.plan?.endDate).getTime();
           bValue = new Date(b.plan?.endDate).getTime();
         }
-        
+
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
@@ -88,7 +88,7 @@ const UserTable = ({ users, onRenew, onDelete }) => {
             const daysLeftStr = user.daysLeft || calculateDaysLeft(user.plan?.endDate);
             const diffTime = new Date(user.plan?.endDate).getTime() - new Date().getTime();
             const rawDaysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
+
             return (
               <tr key={user._id} className="hover:bg-slate-800/30 transition-colors duration-150 group">
                 <td className="px-6 py-4 font-medium text-slate-100 whitespace-nowrap">
@@ -96,8 +96,8 @@ const UserTable = ({ users, onRenew, onDelete }) => {
                     {user.name}
                   </div>
                   {user.address && (
-                    <div 
-                      className="text-xs font-normal text-slate-500 mt-1 max-w-[200px] truncate" 
+                    <div
+                      className="text-xs font-normal text-slate-500 mt-1 max-w-[200px] truncate"
                       title={user.address}
                     >
                       {user.address}
@@ -112,7 +112,7 @@ const UserTable = ({ users, onRenew, onDelete }) => {
                   </div>
                 </td>
                 <td className="px-6 py-4 text-slate-400 whitespace-nowrap">
-                  {formatDate(user.updatedAt || user.createdAt || user.plan?.startDate)}
+                  {formatDate(user.plan?.startDate || user.updatedAt || user.createdAt)}
                 </td>
                 <td className="px-6 py-4 text-slate-400 whitespace-nowrap">
                   {formatDate(user.plan?.endDate)}
@@ -121,7 +121,7 @@ const UserTable = ({ users, onRenew, onDelete }) => {
                   <Badge text={daysLeftStr} />
                 </td>
                 <td className="px-6 py-4 flex gap-4 items-center">
-                  {rawDaysLeft <= 1 && (
+                  {rawDaysLeft <= 3 && (
                     <>
                       <button onClick={() => onRenew(user)} className="text-primary hover:text-blue-400 font-semibold transition-colors text-xs uppercase" title="Renew Plan">
                         Renew
@@ -129,15 +129,15 @@ const UserTable = ({ users, onRenew, onDelete }) => {
                       <span className="text-slate-500 select-none mx-2 opacity-40">|</span>
                     </>
                   )}
-                  <button 
+                  <button
                     onClick={() => sendWhatsAppReminder(user)}
                     className="p-1.5 bg-green-500/10 text-green-500 rounded-lg hover:bg-green-500 hover:text-white transition-all shadow-sm"
                     title="Send WhatsApp Reminder"
                   >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                   </button>
                   <span className="text-slate-500 select-none mx-2 opacity-40">|</span>
-                  <button onClick={() => { if(window.confirm('Are you sure you want to delete this user completely?')) onDelete(user._id) }} className="text-rose-500/70 hover:text-rose-500 font-semibold transition-colors text-xs uppercase" title="Delete User">
+                  <button onClick={() => { if (window.confirm('Are you sure you want to delete this user completely?')) onDelete(user._id) }} className="text-rose-500/70 hover:text-rose-500 font-semibold transition-colors text-xs uppercase" title="Delete User">
                     Delete
                   </button>
                 </td>

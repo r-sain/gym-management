@@ -36,7 +36,7 @@ const Dashboard = ({ onLogout }) => {
       setLoading(true);
       const [usersRes, expiringRes, statsRes] = await Promise.all([
         getUsers(search),
-        search ? Promise.resolve({ data: expiringUsers }) : getExpiringUsers(5),
+        search ? Promise.resolve({ data: expiringUsers }) : getExpiringUsers(3),
         search ? Promise.resolve({ data: stats }) : getStats()
       ]);
       setUsers(usersRes.data);
