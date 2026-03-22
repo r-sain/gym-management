@@ -1,6 +1,7 @@
 # Akhara Gym Management System
+LIVE URL:  [gym-management-flame-eta.vercel.app](https://gym-management-flame-eta.vercel.app)
 
-A production-ready Gym Management System with a React frontend and Node.js/Express backend, used by my local gym to manage and track their memberships
+A production-ready Gym Management System with a React frontend and Node.js/Express backend, used by my local gym to manage and track their memberships.
 
 ## 🚀 GitHub Setup
 
