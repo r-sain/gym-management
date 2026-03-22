@@ -1,6 +1,6 @@
 # Akhara Gym Management System
 
-A production-ready Gym Management System with a React frontend and Node.js/Express backend.
+A production-ready Gym Management System with a React frontend and Node.js/Express backend, used by my local gym to manage and track their memberships
 
 ## 🚀 GitHub Setup
 
