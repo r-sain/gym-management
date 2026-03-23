@@ -1,11 +1,22 @@
-export const calculateDaysLeft = (endDate) => {
+export const calculateDaysLeft = (endDate, startDate) => {
   if (!endDate) return "Unknown";
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
+  const start = startDate ? new Date(startDate) : null;
+  if (start) start.setHours(0, 0, 0, 0);
+
   const target = new Date(endDate);
   target.setHours(0, 0, 0, 0);
 
+  // 1. Check if plan is in the future
+  if (start && start > today) {
+    const diffTime = start.getTime() - today.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays > 0) return `Starts in ${diffDays} days`;
+  }
+
+  // 2. Regular expiry calculation
   const diffTime = target.getTime() - today.getTime();
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 

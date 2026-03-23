@@ -40,8 +40,38 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
-    billImage: {
-      // Will store extremely large base64 strings
+    lastPaymentDate: {
+      type: Date,
+      default: Date.now
+    },
+    guardianName: {
+      type: String,
+      trim: true
+    },
+    alternatePhone: {
+      type: String,
+      trim: true
+    },
+    bloodGroup: {
+      type: String,
+      trim: true
+    },
+    birthdate: {
+      type: Date
+    },
+    enrollmentFees: {
+      type: Number,
+      default: 0
+    },
+    discountReason: {
+      type: String,
+      trim: true
+    },
+    billNumber: {
+      type: String,
+      trim: true
+    },
+    photo: {
       type: String,
       default: null
     }

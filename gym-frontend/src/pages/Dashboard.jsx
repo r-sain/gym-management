@@ -5,7 +5,9 @@ import ExpiryList from '../components/ExpiryList';
 import SearchBar from '../components/SearchBar';
 import StatsCards from '../components/StatsCards';
 import RenewModal from '../components/RenewModal';
-import { getUsers, getExpiringUsers, getStats, deleteUser, renewUser } from '../services/api';
+import AddMemberModal from '../components/AddMemberModal';
+import UserDetailsModal from '../components/UserDetailsModal';
+import { getUsers, getExpiringUsers, getStats, deleteUser, renewUser, updatePhoto } from '../services/api';
 
 const Dashboard = ({ onLogout }) => {
   const [users, setUsers] = useState([]);
@@ -15,10 +17,12 @@ const Dashboard = ({ onLogout }) => {
   const [takingLong, setTakingLong] = useState(false);
   const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
   // Modals state
   const [renewTarget, setRenewTarget] = useState(null); // stores user obj
+  const [viewTarget, setViewTarget] = useState(null);
 
   // Debounce search
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,12 +90,30 @@ const Dashboard = ({ onLogout }) => {
     }
   };
 
-  const handleRenew = async (planType, price, startDate) => {
+  const handleRenew = async (planType, price, startDate, paymentDate, billNumber) => {
     try {
-      await renewUser(renewTarget._id, { planType, price, startDate });
+      await renewUser(renewTarget._id, { planType, price, startDate, paymentDate, billNumber });
       fetchData();
     } catch (error) {
       alert("Failed to renew user.");
+    }
+  };
+
+  const handleSavePhoto = async (userId, photo) => {
+    try {
+      await updatePhoto(userId, photo);
+      fetchData();
+    } catch (error) {
+      console.error('Failed to save photo:', error);
+    }
+  };
+
+  const handleUserUpdated = (updatedUser) => {
+    setUsers(prevUsers => prevUsers.map(user => 
+      user._id === updatedUser._id ? updatedUser : user
+    ));
+    if (viewTarget && viewTarget._id === updatedUser._id) {
+      setViewTarget(updatedUser);
     }
   };
 
@@ -126,10 +148,10 @@ const Dashboard = ({ onLogout }) => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               Expiring Soon ({expiringUsers.length})
             </button>
-            <Link to="/add" className="shrink-0 flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-blue-600 focus:ring-4 focus:ring-blue-500/20 transition-all shadow-lg shadow-blue-500/20 active:scale-95">
+            <button onClick={() => setIsAddModalOpen(true)} className="shrink-0 flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-blue-600 focus:ring-4 focus:ring-blue-500/20 transition-all shadow-lg shadow-blue-500/20 active:scale-95">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path></svg>
               New Member
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -164,7 +186,12 @@ const Dashboard = ({ onLogout }) => {
             </div>
           </div>
         ) : (
-          <UserTable users={users} onRenew={setRenewTarget} onDelete={handleDelete} />
+          <UserTable 
+            users={users} 
+            onRenew={setRenewTarget} 
+            onDelete={handleDelete} 
+            onViewProfile={setViewTarget}
+          />
         )}
       </div>
 
@@ -196,6 +223,19 @@ const Dashboard = ({ onLogout }) => {
         onClose={() => setRenewTarget(null)}
         userName={renewTarget?.name}
         onRenew={handleRenew}
+      />
+
+      <AddMemberModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={fetchData}
+      />
+      <UserDetailsModal
+        isOpen={!!viewTarget}
+        onClose={() => setViewTarget(null)}
+        user={viewTarget}
+        onPhotoSaved={handleSavePhoto}
+        onUserUpdated={handleUserUpdated}
       />
 
     </div>

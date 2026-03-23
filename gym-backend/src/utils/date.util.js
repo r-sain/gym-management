@@ -1,29 +1,22 @@
 /**
- * Utility to calculate the end date based on plan type.
+ * Utility to calculate the end date based on plan type using fixed day durations.
+ * 1M = 30 days, 3M = 90 days, 6M = 180 days, 1Y = 365 days
  * @param {Date} startDate 
  * @param {String} planType ("1M", "3M", "6M", "1Y")
  * @returns {Date} endDate
  */
-const calculateEndDate = (startDate, planType) => {
-  const endDate = new Date(startDate);
-  
-  switch (planType) {
-    case '1M':
-      endDate.setMonth(endDate.getMonth() + 1);
-      break;
-    case '3M':
-      endDate.setMonth(endDate.getMonth() + 3);
-      break;
-    case '6M':
-      endDate.setMonth(endDate.getMonth() + 6);
-      break;
-    case '1Y':
-      endDate.setFullYear(endDate.getFullYear() + 1);
-      break;
-    default:
-      throw new Error("Invalid plan type");
-  }
+const PLAN_DAYS = {
+  '1M': 30,
+  '3M': 90,
+  '6M': 180,
+  '1Y': 365
+};
 
+const calculateEndDate = (startDate, planType) => {
+  const days = PLAN_DAYS[planType];
+  if (!days) throw new Error("Invalid plan type");
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + days);
   return endDate;
 };
 

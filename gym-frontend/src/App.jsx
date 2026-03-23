@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
-import AddMember from './pages/AddMember';
 import Login from './pages/Login';
 import { pingServer } from './services/api';
 
@@ -25,14 +24,14 @@ function App() {
     setIsAuthenticated(false);
   };
 
-  // 10-minute inactivity lock
+  // 5-minute inactivity lock
   useEffect(() => {
     if (!isAuthenticated) return;
 
     let timeoutId;
     const resetTimer = () => {
       if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(handleLogout, 10 * 60 * 1000); // 10 minutes
+      timeoutId = setTimeout(handleLogout, 5 * 60 * 1000); // 5 minutes
     };
 
     // Events to track user activity
@@ -63,10 +62,6 @@ function App() {
           <Route
             path="/"
             element={isAuthenticated ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/add"
-            element={isAuthenticated ? <AddMember onLogout={handleLogout} /> : <Navigate to="/login" replace />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

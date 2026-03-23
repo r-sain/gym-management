@@ -32,7 +32,14 @@ const createUser = async (req, res) => {
       planType: resolvedPlanType,
       price: req.body.price,
       startDate: req.body.startDate,
-      billImage: req.body.billImage
+      paymentDate: req.body.paymentDate,
+      guardianName: req.body.guardianName,
+      alternatePhone: req.body.alternatePhone,
+      bloodGroup: req.body.bloodGroup,
+      birthdate: req.body.birthdate,
+      enrollmentFees: req.body.enrollmentFees,
+      discountReason: req.body.discountReason,
+      billNumber: req.body.billNumber
     };
     
     const createdUser = await userService.createUser(userData);
@@ -100,15 +107,43 @@ const deleteUser = async (req, res) => {
 
 const renewUser = async (req, res) => {
   try {
-    const { plan, planType, price, startDate } = req.body;
+    const { plan, planType, price, startDate, paymentDate, billNumber } = req.body;
     const resolvedPlanType = plan || planType;
     
     if (!resolvedPlanType) {
       return sendResponse(res, 400, false, null, "Valid plan required to renew.");
     }
     
-    const updatedUser = await userService.renewUser(req.params.id, resolvedPlanType, price, startDate);
+    const updatedUser = await userService.renewUser(req.params.id, resolvedPlanType, price, startDate, paymentDate, billNumber);
     return sendResponse(res, 200, true, updatedUser, "User renewed successfully.");
+  } catch (error) {
+    return sendResponse(res, 500, false, null, `Server error: ${error.message}`);
+  }
+};
+
+const updatePhoto = async (req, res) => {
+  try {
+    const { photo } = req.body;
+    if (!photo) return sendResponse(res, 400, false, null, 'Photo data is required.');
+    const user = await userService.updateUserPhoto(req.params.id, photo);
+    return sendResponse(res, 200, true, user, 'Photo updated successfully.');
+  } catch (error) {
+    return sendResponse(res, 500, false, null, `Server error: ${error.message}`);
+  }
+};
+
+const updateUser = async (req, res) => {
+  try {
+    const { phone, address, alternatePhone, guardianName, bloodGroup, birthdate } = req.body;
+    const updatedUser = await userService.updateUser(req.params.id, {
+      phone,
+      address,
+      alternatePhone,
+      guardianName,
+      bloodGroup,
+      birthdate
+    });
+    return sendResponse(res, 200, true, updatedUser, 'User updated successfully.');
   } catch (error) {
     return sendResponse(res, 500, false, null, `Server error: ${error.message}`);
   }
@@ -120,5 +155,7 @@ module.exports = {
   getExpiringUsers,
   getStats,
   deleteUser,
-  renewUser
+  renewUser,
+  updatePhoto,
+  updateUser
 };

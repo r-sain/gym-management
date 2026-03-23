@@ -17,6 +17,12 @@ router.get('/', userController.getUsers);
 // Renew user plan
 router.put('/:id/renew', userController.renewUser);
 
+// Update user details
+router.put('/:id', userController.updateUser);
+
+// Update user photo
+router.patch('/:id/photo', userController.updatePhoto);
+
 // Delete user
 router.delete('/:id', userController.deleteUser);
 

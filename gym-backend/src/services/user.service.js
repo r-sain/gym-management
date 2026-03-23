@@ -5,9 +5,13 @@ const { calculateEndDate, calculateDaysLeft } = require('../utils/date.util');
  * Create a new user with plan calculation
  */
 const createUser = async (userData) => {
-  const { name, phone, address, planType, price, billImage, startDate: reqStartDate } = userData;
+  const { 
+    name, phone, address, planType, price, startDate: reqStartDate, paymentDate: reqPaymentDate,
+    guardianName, alternatePhone, bloodGroup, birthdate, enrollmentFees, discountReason, billNumber
+  } = userData;
   
   const startDate = reqStartDate ? new Date(reqStartDate) : new Date();
+  const paymentDate = reqPaymentDate ? new Date(reqPaymentDate) : new Date();
   const endDate = calculateEndDate(startDate, planType);
   
   const newUser = new User({
@@ -21,7 +25,14 @@ const createUser = async (userData) => {
     },
     price: price || 0,
     currentPlanPrice: price || 0,
-    billImage
+    lastPaymentDate: paymentDate,
+    guardianName,
+    alternatePhone,
+    bloodGroup,
+    birthdate,
+    enrollmentFees: enrollmentFees || 0,
+    discountReason,
+    billNumber
   });
   
   return await newUser.save();
@@ -73,7 +84,7 @@ const getExpiringUsers = async (days = 5) => {
 /**
  * Renew user plan
  */
-const renewUser = async (id, additionalPlanType, additionalPrice, reqStartDate) => {
+const renewUser = async (id, additionalPlanType, additionalPrice, reqStartDate, reqPaymentDate, billNumber) => {
   const user = await User.findById(id);
   if (!user) throw new Error('User not found');
   
@@ -82,11 +93,32 @@ const renewUser = async (id, additionalPlanType, additionalPrice, reqStartDate) 
   const newEndDate = calculateEndDate(startCalculationDate, additionalPlanType);
   
   user.plan.type = additionalPlanType;
+  user.plan.startDate = startCalculationDate;
   user.plan.endDate = newEndDate;
   user.price += Number(additionalPrice || 0);
   user.currentPlanPrice = Number(additionalPrice || 0);
+  user.lastPaymentDate = reqPaymentDate ? new Date(reqPaymentDate) : new Date();
+  user.billNumber = billNumber; 
   
   return await user.save();
+};
+
+/**
+ * Update user photo (base64)
+ */
+const updateUserPhoto = async (id, photo) => {
+  const user = await User.findByIdAndUpdate(id, { photo }, { new: true });
+  if (!user) throw new Error('User not found');
+  return user;
+};
+
+/**
+ * Update user details
+ */
+const updateUser = async (id, updateData) => {
+  const user = await User.findByIdAndUpdate(id, updateData, { new: true });
+  if (!user) throw new Error('User not found');
+  return user;
 };
 
 /**
@@ -124,6 +156,8 @@ module.exports = {
   searchUsers,
   getExpiringUsers,
   renewUser,
+  updateUserPhoto,
+  updateUser,
   deleteUser,
   getStats
 };

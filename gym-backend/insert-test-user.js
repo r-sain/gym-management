@@ -29,7 +29,8 @@ const generateRandomUsers = async () => {
           type: chosenPlan,
           startDate: startDate,
           endDate: endDate
-        }
+        },
+        lastPaymentDate: startDate
       });
     }
 

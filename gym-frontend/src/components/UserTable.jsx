@@ -23,7 +23,7 @@ const sendWhatsAppReminder = (user) => {
   window.open(waUrl, '_blank');
 };
 
-const UserTable = ({ users, onRenew, onDelete }) => {
+const UserTable = ({ users, onRenew, onDelete, onViewProfile }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   const sortedUsers = useMemo(() => {
@@ -70,65 +70,83 @@ const UserTable = ({ users, onRenew, onDelete }) => {
       <table className="w-full text-sm text-left text-slate-300">
         <thead className="sticky top-0 z-10 text-xs uppercase bg-slate-800/95 backdrop-blur-md text-slate-400 border-b border-slate-700/50 shadow-sm">
           <tr>
-            <th scope="col" className="px-6 py-4">Name</th>
-            <th scope="col" className="px-6 py-4">Phone</th>
-            <th scope="col" className="px-6 py-4">Plan & Price</th>
-            <th scope="col" className="px-6 py-4">Last Payment</th>
-            <th scope="col" className="px-6 py-4 cursor-pointer hover:text-white transition-colors select-none" onClick={() => requestSort('expiry')} title="Sort by Expiry">
-              Expiry Date {getSortIcon('expiry')}
+            <th scope="col" className="px-4 py-3">Name</th>
+            <th scope="col" className="px-4 py-3">Phone</th>
+            <th scope="col" className="px-4 py-3">Plan & Price</th>
+            <th scope="col" className="px-4 py-3">Payment</th>
+            <th scope="col" className="px-4 py-3 text-xs">Plan Start</th>
+            <th scope="col" className="px-4 py-3 cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('expiry')} title="Sort by Expiry">
+              Expiry {getSortIcon('expiry')}
             </th>
-            <th scope="col" className="px-6 py-4 cursor-pointer hover:text-white transition-colors select-none" onClick={() => requestSort('status')} title="Sort by Status">
+            <th scope="col" className="px-4 py-3 cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('status')} title="Sort by Status">
               Status {getSortIcon('status')}
             </th>
-            <th scope="col" className="px-6 py-4">Actions</th>
+            <th scope="col" className="px-4 py-3">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-700/50">
           {sortedUsers.map((user) => {
-            const daysLeftStr = user.daysLeft || calculateDaysLeft(user.plan?.endDate);
+            const daysLeftStr = user.daysLeft || calculateDaysLeft(user.plan?.endDate, user.plan?.startDate);
             const diffTime = new Date(user.plan?.endDate).getTime() - new Date().getTime();
             const rawDaysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
             return (
               <tr key={user._id} className="hover:bg-slate-800/30 transition-colors duration-150 group">
-                <td className="px-6 py-4 font-medium text-slate-100 whitespace-nowrap">
-                  <div className="flex items-center gap-2">
+                <td className="px-4 py-3 font-medium text-slate-100">
+                  <button 
+                    onClick={() => onViewProfile(user)}
+                    className="flex items-center gap-2 hover:text-primary transition-colors text-left font-bold"
+                    title="View Full Profile"
+                  >
                     {user.name}
-                  </div>
-                  {user.address && (
-                    <div
-                      className="text-xs font-normal text-slate-500 mt-1 max-w-[200px] truncate"
-                      title={user.address}
-                    >
-                      {user.address}
-                    </div>
-                  )}
+                  </button>
                 </td>
-                <td className="px-6 py-4 text-slate-300">{user.phone}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-3 text-slate-300">{user.phone}</td>
+                <td className="px-4 py-3 whitespace-nowrap">
                   <span className="bg-slate-800 text-slate-300 px-2.5 py-1 rounded text-xs font-semibold border border-slate-700">{user.plan?.type || '-'}</span>
                   <div className="text-xs text-amber-400 mt-1.5 font-medium ml-1 flex items-center">
                     ₹{(user.currentPlanPrice || user.price || 0).toLocaleString()}
                   </div>
                 </td>
-                <td className="px-6 py-4 text-slate-400 whitespace-nowrap">
-                  {formatDate(user.plan?.startDate || user.updatedAt || user.createdAt)}
+                <td className="px-4 py-3 text-slate-400 whitespace-nowrap text-xs">
+                  {formatDate(user.lastPaymentDate || user.createdAt)}
                 </td>
-                <td className="px-6 py-4 text-slate-400 whitespace-nowrap">
+                <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-[10px]">
+                  {formatDate(user.plan?.startDate)}
+                </td>
+                <td className="px-4 py-3 text-slate-400 whitespace-nowrap font-medium text-xs">
                   {formatDate(user.plan?.endDate)}
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-4 py-3">
                   <Badge text={daysLeftStr} />
                 </td>
-                <td className="px-6 py-4 flex gap-4 items-center">
-                  {rawDaysLeft <= 3 && (
-                    <>
-                      <button onClick={() => onRenew(user)} className="text-primary hover:text-blue-400 font-semibold transition-colors text-xs uppercase" title="Renew Plan">
+                <td className="px-4 py-3 flex gap-2 items-center text-xs">
+                  {(() => {
+                    const canRenew = rawDaysLeft <= 3;
+                    return (
+                      <button
+                        disabled={!canRenew}
+                        onClick={() => {
+                          if (rawDaysLeft > 0) {
+                            if (window.confirm(`This member still has ${rawDaysLeft} days left. Are you sure you want to renew now?`)) {
+                              onRenew(user);
+                            }
+                          } else {
+                            onRenew(user);
+                          }
+                        }}
+                        className={`${
+                          canRenew 
+                            ? "text-primary hover:text-blue-400 font-semibold cursor-pointer" 
+                            : "text-slate-600 cursor-not-allowed opacity-50"
+                        } transition-colors uppercase`}
+                        title={canRenew ? "Renew Plan" : `Too early to renew (Expires in ${rawDaysLeft} days)`}
+                      >
                         Renew
                       </button>
-                      <span className="text-slate-500 select-none mx-2 opacity-40">|</span>
-                    </>
-                  )}
+                    );
+                  })()}
+                  <span className="text-slate-500 select-none mx-2 opacity-20">|</span>
                   <button
                     onClick={() => sendWhatsAppReminder(user)}
                     className="p-1.5 bg-green-500/10 text-green-500 rounded-lg hover:bg-green-500 hover:text-white transition-all shadow-sm"
