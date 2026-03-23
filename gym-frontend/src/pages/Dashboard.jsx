@@ -13,7 +13,9 @@ const Dashboard = ({ onLogout }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [takingLong, setTakingLong] = useState(false);
+  const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Modals state
   const [renewTarget, setRenewTarget] = useState(null); // stores user obj
@@ -48,6 +50,7 @@ const Dashboard = ({ onLogout }) => {
   const fetchData = async (search = '') => {
     try {
       setLoading(true);
+      setError(false);
       const [usersRes, expiringRes, statsRes] = await Promise.all([
         getUsers(search),
         search ? Promise.resolve({ data: expiringUsers }) : getExpiringUsers(3),
@@ -58,8 +61,17 @@ const Dashboard = ({ onLogout }) => {
         setExpiringUsers(expiringRes.data);
         setStats(statsRes.data);
       }
+      setRetryCount(0); // Reset on success
     } catch (error) {
       console.error("Error fetching data:", error);
+      
+      // Auto-retry once if it fails on the first load (likely cold start)
+      if (retryCount < 1 && !search) {
+        setRetryCount(prev => prev + 1);
+        setTimeout(() => fetchData(search), 2000); // Wait 2s and try again
+      } else {
+        setError(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -140,6 +152,16 @@ const Dashboard = ({ onLogout }) => {
                 <p className="text-slate-500 text-xs mt-1">This might take up to 60 seconds on the first load.</p>
               </div>
             )}
+          </div>
+        ) : error ? (
+          <div className="h-64 flex flex-col items-center justify-center bg-card/20 rounded-2xl border border-rose-500/20 gap-4">
+            <div className="p-3 bg-rose-500/10 rounded-full">
+              <svg className="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div className="text-center">
+              <p className="text-slate-300 font-medium">Oops! Server is still sleepy.</p>
+              <p className="text-slate-500 text-xs mt-1">We couldn't reach the gym database. Please refresh the page in a few seconds.</p>
+            </div>
           </div>
         ) : (
           <UserTable users={users} onRenew={setRenewTarget} onDelete={handleDelete} />
