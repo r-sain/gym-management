@@ -3,11 +3,17 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Dashboard from './pages/Dashboard';
 import AddMember from './pages/AddMember';
 import Login from './pages/Login';
+import { pingServer } from './services/api';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem('gym_auth') === 'true'
   );
+
+  // Wake up server on mount
+  useEffect(() => {
+    pingServer();
+  }, []);
 
   const handleLogin = () => {
     localStorage.setItem('gym_auth', 'true');

@@ -15,6 +15,11 @@ app.get('/', (req, res) => {
   res.json({ success: true, message: 'Gym Management API is running' });
 });
 
+// Ping route for waking up Render service
+app.get('/api/ping', (req, res) => {
+  res.json({ success: true, message: 'pong' });
+});
+
 // API Routes
 app.use('/api/users', userRoutes);
 

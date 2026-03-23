@@ -2,7 +2,18 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'https://gym-management-opnz.onrender.com/api',
+  timeout: 30000, // 30 second timeout for cold starts
 });
+
+export const pingServer = async () => {
+  try {
+    const response = await api.get('/ping');
+    return response.data;
+  } catch (error) {
+    console.error("Server warming failed:", error.message);
+    return null;
+  }
+};
 
 export const getUsers = async (search = '') => {
   const url = search ? `/users?search=${search}` : '/users';

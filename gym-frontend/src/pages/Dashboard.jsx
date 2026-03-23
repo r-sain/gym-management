@@ -12,6 +12,7 @@ const Dashboard = ({ onLogout }) => {
   const [expiringUsers, setExpiringUsers] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [takingLong, setTakingLong] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Modals state
@@ -23,6 +24,19 @@ const Dashboard = ({ onLogout }) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Handle slow loading (cold start) feedback
+  useEffect(() => {
+    let timer;
+    if (loading) {
+      timer = setTimeout(() => {
+        setTakingLong(true);
+      }, 3000); // 3 seconds
+    } else {
+      setTakingLong(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -118,8 +132,14 @@ const Dashboard = ({ onLogout }) => {
       {/* Main Table */}
       <div className="mt-2 flex-1 min-h-0 pb-4">
         {loading ? (
-          <div className="h-64 flex items-center justify-center bg-card/20 rounded-2xl border border-slate-800">
+          <div className="h-64 flex flex-col items-center justify-center bg-card/20 rounded-2xl border border-slate-800 gap-4">
             <div className="w-10 h-10 border-4 border-slate-700 border-t-primary rounded-full animate-spin"></div>
+            {takingLong && (
+              <div className="text-center animate-pulse">
+                <p className="text-slate-300 font-medium">Waking up server...</p>
+                <p className="text-slate-500 text-xs mt-1">This might take up to 60 seconds on the first load.</p>
+              </div>
+            )}
           </div>
         ) : (
           <UserTable users={users} onRenew={setRenewTarget} onDelete={handleDelete} />
