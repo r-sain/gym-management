@@ -87,6 +87,24 @@ const getExpiringUsers = async (req, res) => {
   }
 };
 
+/**
+ * Get users with birthdays within N days
+ */
+const getBirthdayUsers = async (req, res) => {
+  try {
+    const days = req.query.days !== undefined ? parseInt(req.query.days, 10) : 3;
+    
+    if (isNaN(days)) {
+      return sendResponse(res, 400, false, null, "Please provide a valid number of days in the query string (e.g., ?days=3).");
+    }
+    
+    const users = await userService.getBirthdayUsers(days);
+    return sendResponse(res, 200, true, users, `Retrieved users with birthdays in next ${days} days.`);
+  } catch (error) {
+    return sendResponse(res, 500, false, null, `Server error: ${error.message}`);
+  }
+};
+
 const getStats = async (req, res) => {
   try {
     const stats = await userService.getStats();
@@ -153,6 +171,7 @@ module.exports = {
   createUser,
   getUsers,
   getExpiringUsers,
+  getBirthdayUsers,
   getStats,
   deleteUser,
   renewUser,

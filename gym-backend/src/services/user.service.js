@@ -82,6 +82,58 @@ const getExpiringUsers = async (days = 5) => {
 };
 
 /**
+ * Get users with birthdays within N days (including past and future within range)
+ */
+const getBirthdayUsers = async (days = 3) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Get users with birthdate field set
+  const users = await User.find({ birthdate: { $exists: true, $ne: null } }).lean();
+
+  const birthdayUsers = users.filter(user => {
+    if (!user.birthdate) return false;
+
+    const birthDate = new Date(user.birthdate);
+    const currentYear = today.getFullYear();
+
+    // Calculate birthday this year
+    const birthdayThisYear = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+
+    const diffTime = birthdayThisYear.getTime() - today.getTime();
+    let daysUntilBirthday = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (daysUntilBirthday < -1) {
+      // Birthday was more than 1 day ago, check next year
+      birthdayThisYear.setFullYear(currentYear + 1);
+      const newDiffTime = birthdayThisYear.getTime() - today.getTime();
+      daysUntilBirthday = Math.ceil(newDiffTime / (1000 * 60 * 60 * 24));
+    }
+
+    return daysUntilBirthday >= -1 && daysUntilBirthday <= days;
+  });
+
+  return birthdayUsers.map(user => {
+    const birthDate = new Date(user.birthdate);
+    const currentYear = today.getFullYear();
+    const birthdayThisYear = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+    const diffTime = birthdayThisYear.getTime() - today.getTime();
+    let daysUntilBirthday = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (daysUntilBirthday < -1) {
+      birthdayThisYear.setFullYear(currentYear + 1);
+      const newDiffTime = birthdayThisYear.getTime() - today.getTime();
+      daysUntilBirthday = Math.ceil(newDiffTime / (1000 * 60 * 60 * 24));
+    }
+
+    return {
+      ...user,
+      daysUntilBirthday
+    };
+  }).sort((a, b) => a.daysUntilBirthday - b.daysUntilBirthday);
+};
+
+/**
  * Renew user plan
  */
 const renewUser = async (id, additionalPlanType, additionalPrice, reqStartDate, reqPaymentDate, billNumber) => {
@@ -155,6 +207,7 @@ module.exports = {
   getAllUsers,
   searchUsers,
   getExpiringUsers,
+  getBirthdayUsers,
   renewUser,
   updateUserPhoto,
   updateUser,

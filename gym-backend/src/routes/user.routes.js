@@ -11,6 +11,9 @@ router.post('/', userController.createUser);
 // Get expiring users
 router.get('/expiring', userController.getExpiringUsers);
 
+// Get birthday users
+router.get('/birthdays', userController.getBirthdayUsers);
+
 // Get all users or search users
 router.get('/', userController.getUsers);
 
