@@ -2,21 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserTable from '../components/UserTable';
 import ExpiryList from '../components/ExpiryList';
+import BirthdayList from '../components/BirthdayList';
 import SearchBar from '../components/SearchBar';
 import StatsCards from '../components/StatsCards';
 import RenewModal from '../components/RenewModal';
 import AddMemberModal from '../components/AddMemberModal';
 import UserDetailsModal from '../components/UserDetailsModal';
-import { getUsers, getExpiringUsers, getStats, deleteUser, renewUser, updatePhoto } from '../services/api';
+import { getUsers, getExpiringUsers, getBirthdayUsers, getStats, deleteUser, renewUser, updatePhoto } from '../services/api';
 
 const Dashboard = ({ onLogout }) => {
   const [users, setUsers] = useState([]);
   const [expiringUsers, setExpiringUsers] = useState([]);
+  const [birthdayUsers, setBirthdayUsers] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [takingLong, setTakingLong] = useState(false);
   const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBirthdayModalOpen, setIsBirthdayModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
@@ -55,14 +58,16 @@ const Dashboard = ({ onLogout }) => {
     try {
       setLoading(true);
       setError(false);
-      const [usersRes, expiringRes, statsRes] = await Promise.all([
+      const [usersRes, expiringRes, birthdayRes, statsRes] = await Promise.all([
         getUsers(search),
         search ? Promise.resolve({ data: expiringUsers }) : getExpiringUsers(3),
+        search ? Promise.resolve({ data: birthdayUsers }) : getBirthdayUsers(3),
         search ? Promise.resolve({ data: stats }) : getStats()
       ]);
       setUsers(usersRes.data);
       if (!search) {
         setExpiringUsers(expiringRes.data);
+        setBirthdayUsers(birthdayRes.data);
         setStats(statsRes.data);
       }
       setRetryCount(0); // Reset on success
@@ -147,8 +152,12 @@ const Dashboard = ({ onLogout }) => {
             <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 px-5 py-2.5 bg-rose-500/10 text-rose-500 text-sm font-semibold rounded-xl hover:bg-rose-500/20 border border-rose-500/20 transition-all active:scale-95">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               Expiring Soon ({expiringUsers.length})
-            </button>
-            <button onClick={() => setIsAddModalOpen(true)} className="shrink-0 flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-blue-600 focus:ring-4 focus:ring-blue-500/20 transition-all shadow-lg shadow-blue-500/20 active:scale-95">
+            </button>            <button onClick={() => setIsBirthdayModalOpen(true)} className="flex items-center gap-2 px-4 py-2.5 bg-orange-500/10 text-orange-500 text-sm font-semibold rounded-xl hover:bg-orange-500/20 border border-orange-500/20 transition-all active:scale-95">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 6C13.1 6 14 5.1 14 4C14 2.9 13.1 2 12 2C10.9 2 10 2.9 10 4C10 5.1 10.9 6 12 6ZM8 8H16V12H8V8ZM4 14H20V16H18V20C18 21.1 17.1 22 16 22H8C6.9 22 6 21.1 6 20V16H4V14Z" />
+              </svg>
+              Birthdays ({birthdayUsers.length})
+            </button>            <button onClick={() => setIsAddModalOpen(true)} className="shrink-0 flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-blue-600 focus:ring-4 focus:ring-blue-500/20 transition-all shadow-lg shadow-blue-500/20 active:scale-95">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path></svg>
               New Member
             </button>
@@ -212,6 +221,30 @@ const Dashboard = ({ onLogout }) => {
             </div>
             <div className="p-6 overflow-y-auto custom-scrollbar">
               <ExpiryList users={expiringUsers} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Birthday Modal */}
+      {isBirthdayModalOpen && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+          <div className="bg-card w-full max-w-md rounded-2xl shadow-2xl border border-slate-700/50 flex flex-col max-h-[85vh]">
+            <div className="flex justify-between items-center p-5 border-b border-slate-700/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-500/20 rounded-lg">
+                  <svg className="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 6C13.1 6 14 5.1 14 4C14 2.9 13.1 2 12 2C10.9 2 10 2.9 10 4C10 5.1 10.9 6 12 6ZM8 8H16V12H8V8ZM4 14H20V16H18V20C18 21.1 17.1 22 16 22H8C6.9 22 6 21.1 6 20V16H4V14Z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-slate-100 uppercase tracking-wider">Birthdays</h3>
+              </div>
+              <button onClick={() => setIsBirthdayModalOpen(false)} className="text-slate-400 hover:text-white transition-colors bg-slate-800/80 hover:bg-slate-700 rounded-lg p-1.5 focus:outline-none focus:ring-2 focus:ring-slate-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto custom-scrollbar">
+              <BirthdayList users={birthdayUsers} />
             </div>
           </div>
         </div>

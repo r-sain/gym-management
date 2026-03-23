@@ -26,6 +26,11 @@ export const getExpiringUsers = async (days = 5) => {
   return response.data;
 };
 
+export const getBirthdayUsers = async (days = 3) => {
+  const response = await api.get(`/users/birthdays?days=${days}`);
+  return response.data;
+};
+
 export const createUser = async (userData) => {
   const response = await api.post('/users', userData);
   return response.data;
