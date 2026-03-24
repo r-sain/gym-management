@@ -272,7 +272,7 @@ const UserTable = ({ users, onRenew, onDelete, onViewProfile }) => {
                 <td className="px-4 py-3 text-slate-400 whitespace-nowrap text-xs">
                   {formatDate(user.lastPaymentDate || user.createdAt)}
                 </td>
-                <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-[10px]">
+                <td className="px-4 py-3 text-slate-400 whitespace-nowrap font-medium text-xs">
                   {formatDate(user.plan?.startDate)}
                 </td>
                 <td className="px-4 py-3 text-slate-400 whitespace-nowrap font-medium text-xs">
