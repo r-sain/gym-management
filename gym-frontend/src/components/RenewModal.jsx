@@ -60,7 +60,6 @@ const RenewModal = ({ isOpen, onClose, onRenew, userName }) => {
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">Start Date</label>
               <input required type="date" name="startDate" value={formData.startDate} onChange={(e) => setFormData({...formData, startDate: e.target.value})} 
-                min={new Date().toISOString().split('T')[0]}
                 className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert" />
             </div>
           </div>

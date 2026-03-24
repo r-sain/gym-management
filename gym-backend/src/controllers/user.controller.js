@@ -167,6 +167,15 @@ const updateUser = async (req, res) => {
   }
 };
 
+const getPaymentHistory = async (req, res) => {
+  try {
+    const paymentHistory = await userService.getPaymentHistory(req.params.id);
+    return sendResponse(res, 200, true, paymentHistory, 'Payment history retrieved successfully.');
+  } catch (error) {
+    return sendResponse(res, 500, false, null, `Server error: ${error.message}`);
+  }
+};
+
 module.exports = {
   createUser,
   getUsers,
@@ -176,5 +185,6 @@ module.exports = {
   deleteUser,
   renewUser,
   updatePhoto,
-  updateUser
+  updateUser,
+  getPaymentHistory
 };

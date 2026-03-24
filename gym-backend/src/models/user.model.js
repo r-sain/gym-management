@@ -74,7 +74,15 @@ const userSchema = new mongoose.Schema(
     photo: {
       type: String,
       default: null
-    }
+    },
+    paymentHistory: [
+      {
+        date: Date,
+        planType: String,
+        amount: Number,
+        billNumber: String
+      }
+    ]
   },
   {
     timestamps: true

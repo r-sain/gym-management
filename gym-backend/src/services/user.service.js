@@ -32,7 +32,15 @@ const createUser = async (userData) => {
     birthdate,
     enrollmentFees: enrollmentFees || 0,
     discountReason,
-    billNumber
+    billNumber,
+    paymentHistory: [
+      {
+        date: paymentDate,
+        planType: planType,
+        amount: price || 0,
+        billNumber: billNumber || ''
+      }
+    ]
   });
   
   return await newUser.save();
@@ -143,14 +151,30 @@ const renewUser = async (id, additionalPlanType, additionalPrice, reqStartDate, 
   const today = new Date();
   const startCalculationDate = reqStartDate ? new Date(reqStartDate) : (user.plan.endDate > today ? user.plan.endDate : today);
   const newEndDate = calculateEndDate(startCalculationDate, additionalPlanType);
+  const paymentDate = reqPaymentDate ? new Date(reqPaymentDate) : new Date();
   
   user.plan.type = additionalPlanType;
   user.plan.startDate = startCalculationDate;
   user.plan.endDate = newEndDate;
   user.price += Number(additionalPrice || 0);
   user.currentPlanPrice = Number(additionalPrice || 0);
-  user.lastPaymentDate = reqPaymentDate ? new Date(reqPaymentDate) : new Date();
-  user.billNumber = billNumber; 
+  user.lastPaymentDate = paymentDate;
+  user.billNumber = billNumber;
+  
+  // Add to payment history and keep only last 3 payments
+  if (!user.paymentHistory) {
+    user.paymentHistory = [];
+  }
+  user.paymentHistory.push({
+    date: paymentDate,
+    planType: additionalPlanType,
+    amount: Number(additionalPrice || 0),
+    billNumber: billNumber || ''
+  });
+  // Keep only last 3 payments
+  if (user.paymentHistory.length > 3) {
+    user.paymentHistory = user.paymentHistory.slice(-3);
+  }
   
   return await user.save();
 };
@@ -202,6 +226,15 @@ const getStats = async () => {
   };
 };
 
+/**
+ * Get payment history for a user
+ */
+const getPaymentHistory = async (id) => {
+  const user = await User.findById(id, 'paymentHistory');
+  if (!user) throw new Error('User not found');
+  return user.paymentHistory || [];
+};
+
 module.exports = {
   createUser,
   getAllUsers,
@@ -212,5 +245,6 @@ module.exports = {
   updateUserPhoto,
   updateUser,
   deleteUser,
-  getStats
+  getStats,
+  getPaymentHistory
 };

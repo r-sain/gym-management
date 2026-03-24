@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { formatDate } from '../utils/date';
 import WebcamModal from './WebcamModal';
-import { updateUser } from '../services/api';
+import PaymentHistoryTooltip from './PaymentHistoryTooltip';
+import { updateUser, getPaymentHistory } from '../services/api';
 
 const InfoRow = React.memo(({ label, value, icon, field, editable = false, type = 'text', options = [], editData, setEditData, isEditing }) => (
   <div className="flex flex-col gap-1 p-3 bg-slate-900/40 rounded-xl border border-slate-800/50">
@@ -42,6 +43,7 @@ const UserDetailsModal = ({ isOpen, onClose, user, onPhotoSaved, onUserUpdated }
   const [showPhoto, setShowPhoto] = useState(false);
   const [localPhoto, setLocalPhoto] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [paymentHistory, setPaymentHistory] = useState([]);
   const [editData, setEditData] = useState({
     phone: '',
     address: '',
@@ -74,6 +76,18 @@ const UserDetailsModal = ({ isOpen, onClose, user, onPhotoSaved, onUserUpdated }
         bloodGroup: user.bloodGroup || '',
         birthdate: birthdateValue
       });
+
+      // Fetch payment history
+      const fetchPaymentHistory = async () => {
+        try {
+          const paymentHistoryData = await getPaymentHistory(user._id);
+          setPaymentHistory(paymentHistoryData || []);
+        } catch (error) {
+          console.error('Failed to fetch payment history:', error);
+          setPaymentHistory([]);
+        }
+      };
+      fetchPaymentHistory();
     }
   }, [user]);
 
@@ -231,7 +245,9 @@ const UserDetailsModal = ({ isOpen, onClose, user, onPhotoSaved, onUserUpdated }
               </div>
               <div className="flex flex-col text-right sm:text-left">
                 <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Paid Lifetime</span>
-                <span className="text-sm font-black text-primary">₹{user.price?.toLocaleString()}</span>
+                <PaymentHistoryTooltip paymentHistory={paymentHistory}>
+                  <span className="text-sm font-black text-primary cursor-help hover:text-blue-400 transition-colors">₹{user.price?.toLocaleString()}</span>
+                </PaymentHistoryTooltip>
               </div>
               {user.enrollmentFees > 0 && (
                 <div className="flex flex-col">

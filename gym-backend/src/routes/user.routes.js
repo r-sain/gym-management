@@ -14,6 +14,9 @@ router.get('/expiring', userController.getExpiringUsers);
 // Get birthday users
 router.get('/birthdays', userController.getBirthdayUsers);
 
+// Get payment history
+router.get('/:id/payment-history', userController.getPaymentHistory);
+
 // Get all users or search users
 router.get('/', userController.getUsers);
 
