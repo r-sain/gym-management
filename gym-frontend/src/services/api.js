@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://gym-management-opnz.onrender.com/api',
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    'https://gym-management-opnz.onrender.com/api',
   timeout: 30000, // 30 second timeout for cold starts
 });
 
@@ -10,7 +12,7 @@ export const pingServer = async () => {
     const response = await api.get('/ping');
     return response.data;
   } catch (error) {
-    console.error("Server warming failed:", error.message);
+    console.error('Server warming failed:', error.message);
     return null;
   }
 };
@@ -31,7 +33,7 @@ export const getBirthdayUsers = async (days = 3) => {
   return response.data;
 };
 
-export const createUser = async (userData) => {
+export const createUser = async userData => {
   const response = await api.post('/users', userData);
   return response.data;
 };
@@ -56,15 +58,46 @@ export const updateUser = async (id, userData) => {
   return response.data;
 };
 
-export const deleteUser = async (id) => {
+export const deleteUser = async id => {
   const response = await api.delete(`/users/${id}`);
   return response.data;
 };
 
-export const getPaymentHistory = async (id) => {
+export const getPaymentHistory = async id => {
   const response = await api.get(`/users/${id}/payment-history`);
   // response.data structure: { success, data: [...], message }
   return response.data.data || [];
+};
+
+export const exportUsers = async () => {
+  try {
+    const response = await api.get('/users/export/excel', {
+      responseType: 'blob',
+    });
+
+    // Create a blob from the response
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+
+    // Create download link and trigger download
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute(
+      'download',
+      `Akhara_Gym_Members_${new Date().toISOString().split('T')[0]}.xlsx`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return true;
+  } catch (error) {
+    console.error('Export failed:', error);
+    throw error;
+  }
 };
 
 export default api;
