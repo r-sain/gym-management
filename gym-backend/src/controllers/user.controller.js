@@ -53,6 +53,8 @@ const createUser = async (req, res) => {
       enrollmentFees: req.body.enrollmentFees,
       discountReason: req.body.discountReason,
       billNumber: req.body.billNumber,
+      idType: req.body.idType,
+      idNumber: req.body.idNumber,
     };
 
     const createdUser = await userService.createUser(userData);
@@ -285,6 +287,8 @@ const updateUser = async (req, res) => {
       guardianName,
       bloodGroup,
       birthdate,
+      idType,
+      idNumber,
     } = req.body;
     const updatedUser = await userService.updateUser(req.params.id, {
       phone,
@@ -293,6 +297,8 @@ const updateUser = async (req, res) => {
       guardianName,
       bloodGroup,
       birthdate,
+      idType,
+      idNumber,
     });
     return sendResponse(
       res,
@@ -355,6 +361,8 @@ const exportUsersAsExcel = async (req, res) => {
       { wch: 12 }, // Total Paid
       { wch: 18 }, // Current Plan Price
       { wch: 25 }, // Address
+      { wch: 15 }, // ID Type
+      { wch: 20 }, // ID Number
       { wch: 20 }, // Guardian Name
       { wch: 12 }, // Blood Group
       { wch: 15 }, // Enrollment Fee

@@ -100,6 +100,12 @@ const UserTable = ({ users, onRenew, onDelete, onViewProfile }) => {
         if (sortConfig.key === 'expiry' || sortConfig.key === 'status') {
           aValue = new Date(a.plan?.endDate).getTime();
           bValue = new Date(b.plan?.endDate).getTime();
+        } else if (sortConfig.key === 'startDate') {
+          aValue = new Date(a.plan?.startDate).getTime();
+          bValue = new Date(b.plan?.startDate).getTime();
+        } else if (sortConfig.key === 'payment') {
+          aValue = new Date(a.lastPaymentDate || a.createdAt).getTime();
+          bValue = new Date(b.lastPaymentDate || b.createdAt).getTime();
         }
 
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -171,11 +177,21 @@ const UserTable = ({ users, onRenew, onDelete, onViewProfile }) => {
             <th scope="col" className="px-4 py-3">
               Plan & Price
             </th>
-            <th scope="col" className="px-4 py-3">
-              Payment
+            <th
+              scope="col"
+              className="px-4 py-3 cursor-pointer hover:text-white transition-colors"
+              onClick={() => requestSort('payment')}
+              title="Sort by Payment Date"
+            >
+              Payment {getSortIcon('payment')}
             </th>
-            <th scope="col" className="px-4 py-3 text-xs">
-              Plan Start
+            <th
+              scope="col"
+              className="px-4 py-3 text-xs cursor-pointer hover:text-white transition-colors"
+              onClick={() => requestSort('startDate')}
+              title="Sort by Plan Start Date"
+            >
+              Plan Start {getSortIcon('startDate')}
             </th>
             <th
               scope="col"

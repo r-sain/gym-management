@@ -20,6 +20,8 @@ const createUser = async userData => {
     enrollmentFees,
     discountReason,
     billNumber,
+    idType,
+    idNumber,
     enrollmentDate: reqEnrollmentDate,
   } = userData;
 
@@ -48,6 +50,8 @@ const createUser = async userData => {
     enrollmentDate,
     discountReason,
     billNumber,
+    idType,
+    idNumber,
     paymentHistory: [
       {
         date: paymentDate,
@@ -300,6 +304,8 @@ const getAllUsersForExport = async () => {
       : 'N/A',
     'Total Paid': user.price || 0,
     Address: user.address || 'N/A',
+    'ID Type': user.idType || 'N/A',
+    'ID Number': user.idNumber || 'N/A',
     'Guardian Name': user.guardianName || 'N/A',
     'Blood Group': user.bloodGroup || 'N/A',
     'Enrollment Fee': user.enrollmentFees || 0,

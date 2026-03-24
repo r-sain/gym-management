@@ -76,6 +76,8 @@ const UserDetailsModal = ({
     guardianName: '',
     bloodGroup: '',
     birthdate: '',
+    idType: '',
+    idNumber: '',
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -100,6 +102,8 @@ const UserDetailsModal = ({
         guardianName: user.guardianName || '',
         bloodGroup: user.bloodGroup || '',
         birthdate: birthdateValue,
+        idType: user.idType || '',
+        idNumber: user.idNumber || '',
       });
 
       // Fetch payment history
@@ -130,6 +134,13 @@ const UserDetailsModal = ({
   }
 
   const photo = localPhoto || user.photo;
+
+  const idTypeOptions = [
+    { value: 'Aadhaar', label: 'Aadhaar' },
+    { value: 'Voter ID', label: 'Voter ID' },
+    { value: 'PAN', label: 'PAN' },
+    { value: 'Driving License', label: 'Driving License' },
+  ];
 
   const bloodGroupOptions = [
     { value: 'A+', label: 'A+' },
@@ -189,6 +200,8 @@ const UserDetailsModal = ({
         guardianName: user.guardianName || '',
         bloodGroup: user.bloodGroup || '',
         birthdate: birthdateValue,
+        idType: user.idType || '',
+        idNumber: user.idNumber || '',
       });
     }
     setIsEditing(false);
@@ -289,6 +302,26 @@ const UserDetailsModal = ({
               label="WhatsApp Number"
               value={user.phone}
               field="phone"
+              editable={true}
+              editData={editData}
+              setEditData={setEditData}
+              isEditing={isEditing}
+            />
+            <InfoRow
+              label="ID Type"
+              value={user.idType}
+              field="idType"
+              editable={true}
+              type="select"
+              options={idTypeOptions}
+              editData={editData}
+              setEditData={setEditData}
+              isEditing={isEditing}
+            />
+            <InfoRow
+              label="ID Number"
+              value={user.idNumber}
+              field="idNumber"
               editable={true}
               editData={editData}
               setEditData={setEditData}

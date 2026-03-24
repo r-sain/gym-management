@@ -21,6 +21,8 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
     enrollmentFees: '',
     discountReason: '',
     billNumber: '',
+    idType: '',
+    idNumber: '',
   });
   console.log(formData);
   if (!isOpen) return null;
@@ -56,6 +58,8 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
         enrollmentFees: '',
         discountReason: '',
         billNumber: '',
+        idType: '',
+        idNumber: '',
       });
     } catch (err) {
       setError(
@@ -261,6 +265,58 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 pl-1">
+                  ID Type
+                </label>
+                <div className="relative">
+                  <select
+                    name="idType"
+                    value={formData.idType}
+                    onChange={handleChange}
+                    className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 appearance-none focus:outline-none focus:border-primary transition-all cursor-pointer"
+                  >
+                    <option value="">Select ID</option>
+                    <option value="Aadhaar">Aadhaar</option>
+                    <option value="Voter ID">Voter ID</option>
+                    <option value="PAN">PAN</option>
+                    <option value="Driving License">Driving License</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-primary">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 pl-1">
+                  ID Number
+                </label>
+                <input
+                  type="text"
+                  name="idNumber"
+                  value={formData.idNumber}
+                  onChange={handleChange}
+                  disabled={!formData.idType}
+                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary transition-all placeholder-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  placeholder={formData.idType ? `Enter ${formData.idType} Number` : "Select ID Type first"}
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 pl-1">
                 Address
@@ -375,10 +431,9 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
 
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 pl-1">
-                Bill Number
+                Bill Number (Optional)
               </label>
               <input
-                required
                 type="text"
                 name="billNumber"
                 value={formData.billNumber}

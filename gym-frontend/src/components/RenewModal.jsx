@@ -77,10 +77,9 @@ const RenewModal = ({ isOpen, onClose, onRenew, userName }) => {
 
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-2">
-              Bill Number
+              Bill Number (Optional)
             </label>
             <input
-              required
               type="text"
               name="billNumber"
               value={formData.billNumber}
