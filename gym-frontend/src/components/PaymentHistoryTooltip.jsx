@@ -4,12 +4,12 @@ const PaymentHistoryTooltip = ({ paymentHistory, children }) => {
   const [isHovering, setIsHovering] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
 
-  const handleMouseEnter = (e) => {
+  const handleMouseEnter = e => {
     const rect = e.currentTarget.getBoundingClientRect();
     // Position tooltip above the element with slight offset
     setTooltipPosition({
       top: rect.top - 10,
-      left: rect.left + rect.width / 2
+      left: rect.left + rect.width / 2,
     });
     setIsHovering(true);
   };
@@ -18,14 +18,19 @@ const PaymentHistoryTooltip = ({ paymentHistory, children }) => {
     setIsHovering(false);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
   };
 
-  const sortedHistory = paymentHistory && paymentHistory.length > 0
-    ? [...paymentHistory].reverse() // Show most recent first
-    : [];
+  const sortedHistory =
+    paymentHistory && paymentHistory.length > 0
+      ? [...paymentHistory].reverse() // Show most recent first
+      : [];
 
   return (
     <div
@@ -42,7 +47,7 @@ const PaymentHistoryTooltip = ({ paymentHistory, children }) => {
             top: `${tooltipPosition.top - 180}px`,
             left: `${tooltipPosition.left - 100}px`,
             transform: 'translateX(-50%)',
-            animation: 'fadeIn 0.2s ease-in-out'
+            animation: 'fadeIn 0.2s ease-in-out',
           }}
         >
           {/* Tooltip Arrow */}
@@ -51,7 +56,7 @@ const PaymentHistoryTooltip = ({ paymentHistory, children }) => {
             style={{
               borderLeft: '6px solid transparent',
               borderRight: '6px solid transparent',
-              borderTop: '6px solid rgb(15, 23, 42)'
+              borderTop: '6px solid rgb(15, 23, 42)',
             }}
           ></div>
 
@@ -61,12 +66,20 @@ const PaymentHistoryTooltip = ({ paymentHistory, children }) => {
 
           <div className="space-y-1.5">
             {sortedHistory.map((payment, index) => (
-              <div key={index} className="text-xs text-slate-300 flex justify-between gap-4">
+              <div
+                key={index}
+                className="text-xs text-slate-300 flex justify-between gap-4"
+              >
                 <span className="font-semibold text-primary">
-                  {index + 1}. ₹{typeof payment.amount === 'number' ? payment.amount.toLocaleString() : payment.amount}
+                  {index + 1}.
+                  {typeof payment.amount === 'number'
+                    ? payment.amount.toLocaleString()
+                    : payment.amount}
                 </span>
                 <span className="text-slate-400">{payment.planType}</span>
-                <span className="text-slate-500 whitespace-nowrap">{formatDate(payment.date)}</span>
+                <span className="text-slate-500 whitespace-nowrap">
+                  {formatDate(payment.date)}
+                </span>
               </div>
             ))}
           </div>
@@ -93,7 +106,7 @@ const PaymentHistoryTooltip = ({ paymentHistory, children }) => {
             top: `${tooltipPosition.top - 80}px`,
             left: `${tooltipPosition.left - 80}px`,
             transform: 'translateX(-50%)',
-            animation: 'fadeIn 0.2s ease-in-out'
+            animation: 'fadeIn 0.2s ease-in-out',
           }}
         >
           <div className="text-xs text-slate-400">No payment history</div>

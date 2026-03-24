@@ -341,7 +341,7 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 pl-1">
-                  Amount Paid (₹)
+                  Amount Paid
                 </label>
                 <input
                   required
@@ -359,7 +359,7 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
 
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 pl-1">
-                Enrollment Fees (₹)
+                Enrollment Fees
               </label>
               <input
                 type="number"

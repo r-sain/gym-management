@@ -377,7 +377,7 @@ const UserDetailsModal = ({
                 </span>
                 <PaymentHistoryTooltip paymentHistory={paymentHistory}>
                   <span className="text-sm font-black text-primary cursor-help hover:text-blue-400 transition-colors">
-                    ₹{user.price?.toLocaleString()}
+                    {user.price?.toLocaleString()}
                   </span>
                 </PaymentHistoryTooltip>
               </div>
@@ -387,7 +387,7 @@ const UserDetailsModal = ({
                     Enrollment Fee
                   </span>
                   <span className="text-sm font-semibold text-slate-200">
-                    ₹{user.enrollmentFees}
+                    {user.enrollmentFees}
                   </span>
                 </div>
               )}

@@ -246,7 +246,6 @@ const UserTable = ({ users, onRenew, onDelete, onViewProfile }) => {
                     {user.plan?.type || '-'}
                   </span>
                   <div className="text-xs text-amber-400 mt-1.5 font-medium ml-1 flex items-center">
-                    ₹
                     {(
                       user.currentPlanPrice ||
                       user.price ||
