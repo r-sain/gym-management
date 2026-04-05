@@ -74,10 +74,12 @@ const Dashboard = ({ onLogout }) => {
         search ? Promise.resolve({ data: birthdayUsers }) : getBirthdayUsers(3),
         search ? Promise.resolve({ data: stats }) : getStats(),
       ]);
-      setUsers(usersRes.data);
+      // Capitalize names for display
+      const capitalizeName = u => ({ ...u, name: u.name?.toUpperCase() || '' });
+      setUsers(usersRes.data.map(capitalizeName));
       if (!search) {
-        setExpiringUsers(expiringRes.data);
-        setBirthdayUsers(birthdayRes.data);
+        setExpiringUsers(expiringRes.data.map(capitalizeName));
+        setBirthdayUsers(birthdayRes.data.map(capitalizeName));
         setStats(statsRes.data);
       }
       setRetryCount(0); // Reset on success
@@ -136,13 +138,14 @@ const Dashboard = ({ onLogout }) => {
   };
 
   const handleUserUpdated = updatedUser => {
+    const uppercaseUser = { ...updatedUser, name: updatedUser.name?.toUpperCase() || '' };
     setUsers(prevUsers =>
       prevUsers.map(user =>
-        user._id === updatedUser._id ? updatedUser : user,
+        user._id === uppercaseUser._id ? uppercaseUser : user,
       ),
     );
-    if (viewTarget && viewTarget._id === updatedUser._id) {
-      setViewTarget(updatedUser);
+    if (viewTarget && viewTarget._id === uppercaseUser._id) {
+      setViewTarget(uppercaseUser);
     }
   };
 

@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      set: v => v ? v.toUpperCase() : v,
     },
     phone: {
       type: String,
