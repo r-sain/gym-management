@@ -24,11 +24,9 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
     idType: '',
     idNumber: '',
   });
-  console.log(formData);
   if (!isOpen) return null;
 
   const handleChange = e => {
-    console.log(formData);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -36,7 +34,6 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    console.log('Submitting:', formData.enrollmentDate);
     try {
       await createUser({ ...formData, price: Number(formData.price) });
       onSuccess();
@@ -64,7 +61,7 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          'Failed to add member. Please try again.',
+        'Failed to add member. Please try again.',
       );
     } finally {
       setLoading(false);
