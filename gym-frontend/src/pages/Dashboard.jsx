@@ -8,6 +8,7 @@ import StatsCards from '../components/StatsCards';
 import RenewModal from '../components/RenewModal';
 import AddMemberModal from '../components/AddMemberModal';
 import UserDetailsModal from '../components/UserDetailsModal';
+import LifterLoader from '../components/LifterLoader';
 import {
   getUsers,
   getExpiringUsers,
@@ -303,7 +304,7 @@ const Dashboard = ({ onLogout }) => {
       <div className="mt-2 flex-1 min-h-0 pb-4">
         {loading ? (
           <div className="h-64 flex flex-col items-center justify-center bg-card/20 rounded-2xl border border-slate-800 gap-4">
-            <div className="w-10 h-10 border-4 border-slate-700 border-t-primary rounded-full animate-spin"></div>
+            <LifterLoader />
             {takingLong && (
               <div className="text-center animate-pulse">
                 <p className="text-slate-300 font-medium">
