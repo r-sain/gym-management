@@ -8,12 +8,12 @@ const server = http.createServer(app);
 
 const startServer = async () => {
   try {
-    // Connect to database
-    await connectDB();
-    
-    // Start server
-    server.listen(PORT, '0.0.0.0', () => {
+    // Start server first so Render health checks pass immediately
+    server.listen(PORT, '0.0.0.0', async () => {
       console.log(`Server running on port ${PORT}`);
+      
+      // Connect to database after listening
+      await connectDB();
     });
   } catch (error) {
     console.error(`Failed to start server: ${error.message}`);

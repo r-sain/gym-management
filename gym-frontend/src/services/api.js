@@ -4,7 +4,7 @@ const api = axios.create({
   baseURL:
     import.meta.env.VITE_API_URL ||
     'https://gym-management-opnz.onrender.com/api',
-  timeout: 60000, // 60 second timeout for cold starts
+  timeout: 100000, // 100 second timeout for Render cold starts
 });
 
 export const pingServer = async () => {
