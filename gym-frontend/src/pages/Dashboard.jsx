@@ -66,7 +66,7 @@ const Dashboard = ({ onLogout }) => {
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
 
-  const fetchData = async (search = '') => {
+  const fetchData = async (search = '', currentRetry = 0) => {
     try {
       setLoading(true);
       setError(false);
@@ -84,14 +84,12 @@ const Dashboard = ({ onLogout }) => {
         setBirthdayUsers(birthdayRes.data.map(capitalizeName));
         setStats(statsRes.data);
       }
-      setRetryCount(0); // Reset on success
     } catch (error) {
       console.error('Error fetching data:', error);
 
       // Auto-retry once if it fails on the first load (likely cold start)
-      if (retryCount < 1 && !search) {
-        setRetryCount(prev => prev + 1);
-        setTimeout(() => fetchData(search), 2000); // Wait 2s and try again
+      if (currentRetry < 1 && !search) {
+        setTimeout(() => fetchData(search, currentRetry + 1), 2000); // Wait 2s and try again
       } else {
         setError(true);
       }
