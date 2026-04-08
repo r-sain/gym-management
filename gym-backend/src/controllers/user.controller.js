@@ -53,6 +53,7 @@ const createUser = async (req, res) => {
       enrollmentFees: req.body.enrollmentFees,
       discountReason: req.body.discountReason,
       billNumber: req.body.billNumber,
+      dueAmount: req.body.dueAmount,
       idType: req.body.idType,
       idNumber: req.body.idNumber,
     };
@@ -220,7 +221,7 @@ const deleteUser = async (req, res) => {
 
 const renewUser = async (req, res) => {
   try {
-    const { plan, planType, price, startDate, paymentDate, billNumber } =
+    const { plan, planType, price, startDate, paymentDate, billNumber, dueAmount } =
       req.body;
     const resolvedPlanType = plan || planType;
 
@@ -241,6 +242,7 @@ const renewUser = async (req, res) => {
       startDate,
       paymentDate,
       billNumber,
+      dueAmount,
     );
     return sendResponse(
       res,
@@ -289,17 +291,20 @@ const updateUser = async (req, res) => {
       birthdate,
       idType,
       idNumber,
+      dueAmount,
     } = req.body;
-    const updatedUser = await userService.updateUser(req.params.id, {
-      phone,
-      address,
-      alternatePhone,
-      guardianName,
-      bloodGroup,
-      birthdate,
-      idType,
-      idNumber,
-    });
+    const updateData = {};
+    if (phone !== undefined) updateData.phone = phone;
+    if (address !== undefined) updateData.address = address;
+    if (alternatePhone !== undefined) updateData.alternatePhone = alternatePhone;
+    if (guardianName !== undefined) updateData.guardianName = guardianName;
+    if (bloodGroup !== undefined) updateData.bloodGroup = bloodGroup;
+    if (birthdate !== undefined) updateData.birthdate = birthdate;
+    if (idType !== undefined) updateData.idType = idType;
+    if (idNumber !== undefined) updateData.idNumber = idNumber;
+    if (dueAmount !== undefined) updateData.dueAmount = dueAmount;
+
+    const updatedUser = await userService.updateUser(req.params.id, updateData);
     return sendResponse(
       res,
       200,

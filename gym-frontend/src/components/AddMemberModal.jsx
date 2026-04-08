@@ -21,6 +21,7 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
     enrollmentFees: '',
     discountReason: '',
     billNumber: '',
+    dueAmount: '',
     idType: '',
     idNumber: '',
   });
@@ -35,7 +36,7 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
     setLoading(true);
     setError(null);
     try {
-      await createUser({ ...formData, price: Number(formData.price) });
+      await createUser({ ...formData, price: Number(formData.price), dueAmount: formData.dueAmount ? Number(formData.dueAmount) : 0 });
       onSuccess();
       onClose();
       // Reset form
@@ -55,6 +56,7 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
         enrollmentFees: '',
         discountReason: '',
         billNumber: '',
+        dueAmount: '',
         idType: '',
         idNumber: '',
       });
@@ -357,7 +359,7 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 pl-1">
                   Subscription
@@ -402,6 +404,22 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
                   min="0"
                   name="price"
                   value={formData.price}
+                  onChange={handleChange}
+                  onWheel={e => e.target.blur()}
+                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary transition-all placeholder-slate-600"
+                  placeholder="0"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 pl-1">
+                  Due Amount
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  name="dueAmount"
+                  value={formData.dueAmount}
                   onChange={handleChange}
                   onWheel={e => e.target.blur()}
                   className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary transition-all placeholder-slate-600"

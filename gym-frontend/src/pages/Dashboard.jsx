@@ -17,6 +17,7 @@ import {
   renewUser,
   updatePhoto,
   exportUsers,
+  updateUser,
 } from '../services/api';
 
 const Dashboard = ({ onLogout }) => {
@@ -113,6 +114,7 @@ const Dashboard = ({ onLogout }) => {
     startDate,
     paymentDate,
     billNumber,
+    dueAmount,
   ) => {
     try {
       await renewUser(renewTarget._id, {
@@ -121,10 +123,21 @@ const Dashboard = ({ onLogout }) => {
         startDate,
         paymentDate,
         billNumber,
+        dueAmount,
       });
       fetchData();
     } catch (error) {
       alert('Failed to renew user.');
+    }
+  };
+
+  const handleUpdateDue = async (id, dueAmount) => {
+    try {
+      await updateUser(id, { dueAmount });
+      fetchData();
+    } catch (error) {
+      console.error('Failed to update due amount:', error);
+      alert('Failed to update due amount.');
     }
   };
 
@@ -335,6 +348,7 @@ const Dashboard = ({ onLogout }) => {
             onRenew={setRenewTarget}
             onDelete={handleDelete}
             onViewProfile={setViewTarget}
+            onUpdateDue={handleUpdateDue}
           />
         )}
       </div>
@@ -440,6 +454,7 @@ const Dashboard = ({ onLogout }) => {
         isOpen={!!renewTarget}
         onClose={() => setRenewTarget(null)}
         userName={renewTarget?.name}
+        currentDue={renewTarget?.dueAmount}
         onRenew={handleRenew}
       />
 

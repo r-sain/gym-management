@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { formatDate } from '../utils/date';
 import WebcamModal from './WebcamModal';
-import PaymentHistoryTooltip from './PaymentHistoryTooltip';
-import { updateUser, getPaymentHistory } from '../services/api';
+import { updateUser } from '../services/api';
 
 const InfoRow = React.memo(
   ({
@@ -68,7 +67,6 @@ const UserDetailsModal = ({
   const [showPhoto, setShowPhoto] = useState(false);
   const [localPhoto, setLocalPhoto] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [paymentHistory, setPaymentHistory] = useState([]);
   const [editData, setEditData] = useState({
     phone: '',
     address: '',
@@ -106,17 +104,7 @@ const UserDetailsModal = ({
         idNumber: user.idNumber || '',
       });
 
-      // Fetch payment history
-      const fetchPaymentHistory = async () => {
-        try {
-          const paymentHistoryData = await getPaymentHistory(user._id);
-          setPaymentHistory(paymentHistoryData || []);
-        } catch (error) {
-          console.error('Failed to fetch payment history:', error);
-          setPaymentHistory([]);
-        }
-      };
-      fetchPaymentHistory();
+
     }
   }, [user]);
 
@@ -408,11 +396,9 @@ const UserDetailsModal = ({
                 <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">
                   Paid Lifetime
                 </span>
-                <PaymentHistoryTooltip paymentHistory={paymentHistory}>
-                  <span className="text-sm font-black text-primary cursor-help hover:text-blue-400 transition-colors">
-                    {user.price?.toLocaleString()}
-                  </span>
-                </PaymentHistoryTooltip>
+                <span className="text-sm font-black text-primary transition-colors">
+                  {user.price?.toLocaleString()}
+                </span>
               </div>
               {user.enrollmentFees > 0 && (
                 <div className="flex flex-col">

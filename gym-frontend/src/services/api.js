@@ -63,11 +63,7 @@ export const deleteUser = async id => {
   return response.data;
 };
 
-export const getPaymentHistory = async id => {
-  const response = await api.get(`/users/${id}/payment-history`);
-  // response.data structure: { success, data: [...], message }
-  return response.data.data || [];
-};
+
 
 export const exportUsers = async () => {
   try {

@@ -89,8 +89,22 @@ const isBirthdaySoon = user => {
   return daysUntilBirthday >= -1 && daysUntilBirthday <= 1;
 };
 
-const UserTable = ({ users, onRenew, onDelete, onViewProfile }) => {
+const UserTable = ({ users, onRenew, onDelete, onViewProfile, onUpdateDue }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [editingDueId, setEditingDueId] = useState(null);
+  const [editingDueAmount, setEditingDueAmount] = useState('');
+
+  const handleDueSubmit = (e, userId) => {
+    e.preventDefault();
+    if (onUpdateDue) {
+      onUpdateDue(userId, Number(editingDueAmount));
+    }
+    setEditingDueId(null);
+  };
+
+  const handleDueKeyDown = (e, userId) => {
+    if (e.key === 'Escape') setEditingDueId(null);
+  };
 
   const sortedUsers = useMemo(() => {
     let sortableItems = [...users];
@@ -106,6 +120,9 @@ const UserTable = ({ users, onRenew, onDelete, onViewProfile }) => {
         } else if (sortConfig.key === 'payment') {
           aValue = new Date(a.lastPaymentDate || a.createdAt).getTime();
           bValue = new Date(b.lastPaymentDate || b.createdAt).getTime();
+        } else if (sortConfig.key === 'due') {
+          aValue = a.dueAmount || 0;
+          bValue = b.dueAmount || 0;
         }
 
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -176,6 +193,14 @@ const UserTable = ({ users, onRenew, onDelete, onViewProfile }) => {
             </th>
             <th scope="col" className="px-4 py-3">
               Plan & Price
+            </th>
+            <th
+              scope="col"
+              className="px-4 py-3 cursor-pointer hover:text-white transition-colors text-right"
+              onClick={() => requestSort('due')}
+              title="Sort by Due Amount"
+            >
+              Due {getSortIcon('due')}
             </th>
             <th
               scope="col"
@@ -268,6 +293,39 @@ const UserTable = ({ users, onRenew, onDelete, onViewProfile }) => {
                       0
                     ).toLocaleString()}
                   </div>
+                </td>
+                <td className="px-4 py-3 text-slate-400 whitespace-nowrap relative text-right">
+                  {editingDueId === user._id ? (
+                    <form onSubmit={(e) => handleDueSubmit(e, user._id)} className="flex items-center justify-end gap-1">
+                      <input
+                        autoFocus
+                        type="number"
+                        min="0"
+                        className="w-16 px-1.5 py-1 text-xs bg-slate-900 border border-primary rounded text-white focus:outline-none focus:ring-1 focus:ring-primary text-right"
+                        value={editingDueAmount}
+                        onChange={(e) => setEditingDueAmount(e.target.value)}
+                        onBlur={(e) => handleDueSubmit(e, user._id)}
+                        onKeyDown={(e) => handleDueKeyDown(e, user._id)}
+                      />
+                    </form>
+                  ) : (
+                    <div 
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => {
+                        setEditingDueId(user._id);
+                        setEditingDueAmount(user.dueAmount || 0);
+                      }}
+                      className="cursor-pointer group flex items-center justify-end gap-1.5 min-w-[3rem]"
+                      title="Click to edit due amount"
+                    >
+                      <span className={`text-xs font-bold ${user.dueAmount > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                        {(user.dueAmount || 0).toLocaleString()}
+                      </span>
+                      <svg className="w-3 h-3 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-slate-400 whitespace-nowrap text-xs">
                   {formatDate(user.lastPaymentDate || user.createdAt)}

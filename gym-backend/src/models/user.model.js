@@ -75,6 +75,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    dueAmount: {
+      type: Number,
+      default: 0,
+    },
     idType: {
       type: String,
       enum: ['Aadhaar', 'Voter ID', 'PAN', 'Driving License', ''],

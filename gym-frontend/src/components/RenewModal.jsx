@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 
-const RenewModal = ({ isOpen, onClose, onRenew, userName }) => {
+const RenewModal = ({ isOpen, onClose, onRenew, userName, currentDue }) => {
   const [formData, setFormData] = useState({
     planType: '1M',
     price: '',
     startDate: new Date().toISOString().split('T')[0],
     paymentDate: new Date().toISOString().split('T')[0],
     billNumber: '',
+    dueAmount: '',
   });
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setFormData(prev => ({ ...prev, dueAmount: '', price: '' }));
+    }
+  }, [isOpen]);
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -21,6 +28,7 @@ const RenewModal = ({ isOpen, onClose, onRenew, userName }) => {
       formData.startDate,
       formData.paymentDate,
       formData.billNumber,
+      formData.dueAmount ? Number(formData.dueAmount) : 0
     );
     setLoading(false);
     onClose();
@@ -56,23 +64,53 @@ const RenewModal = ({ isOpen, onClose, onRenew, userName }) => {
               <option value="1Y">1 Year / Annual</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">
-              Amount Paid
-            </label>
-            <input
-              required
-              type="number"
-              min="0"
-              name="price"
-              value={formData.price}
-              onChange={e =>
-                setFormData({ ...formData, price: e.target.value })
-              }
-              onWheel={e => e.target.blur()}
-              className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary"
-              placeholder="e.g. 1500"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                Amount Paid
+              </label>
+              <input
+                required
+                type="number"
+                min="0"
+                name="price"
+                value={formData.price}
+                onChange={e =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
+                onWheel={e => e.target.blur()}
+                className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary"
+                placeholder="e.g. 1500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-1">
+                Additional Due
+              </label>
+              <input
+                type="number"
+                min="0"
+                name="dueAmount"
+                value={formData.dueAmount}
+                onChange={e =>
+                  setFormData({ ...formData, dueAmount: e.target.value })
+                }
+                onWheel={e => e.target.blur()}
+                className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary"
+                placeholder="0"
+              />
+              <div className="mt-2 px-1 flex flex-col gap-1">
+                <div className="flex justify-between text-[10px] font-medium uppercase tracking-wider">
+                  <span className="text-slate-500">Previous:</span>
+                  <span className="text-slate-400">₹{(currentDue || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
+                  <span className="text-slate-500">New Total:</span>
+                  <span className="text-emerald-400">₹{(Number(currentDue || 0) + Number(formData.dueAmount || 0)).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>

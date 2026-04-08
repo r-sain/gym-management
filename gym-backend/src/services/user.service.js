@@ -20,6 +20,7 @@ const createUser = async userData => {
     enrollmentFees,
     discountReason,
     billNumber,
+    dueAmount,
     idType,
     idNumber,
     enrollmentDate: reqEnrollmentDate,
@@ -50,6 +51,7 @@ const createUser = async userData => {
     enrollmentDate,
     discountReason,
     billNumber,
+    dueAmount: dueAmount || 0,
     idType,
     idNumber,
     paymentHistory: [
@@ -184,6 +186,7 @@ const renewUser = async (
   reqStartDate,
   reqPaymentDate,
   billNumber,
+  dueAmount,
 ) => {
   const user = await User.findById(id);
   if (!user) throw new Error('User not found');
@@ -204,6 +207,9 @@ const renewUser = async (
   user.currentPlanPrice = Number(additionalPrice || 0);
   user.lastPaymentDate = paymentDate;
   user.billNumber = billNumber;
+  if (dueAmount !== undefined) {
+    user.dueAmount = (user.dueAmount || 0) + Number(dueAmount || 0);
+  }
 
   // Add to payment history and keep only last 3 payments
   if (!user.paymentHistory) {
@@ -236,9 +242,35 @@ const updateUserPhoto = async (id, photo) => {
  * Update user details
  */
 const updateUser = async (id, updateData) => {
-  const user = await User.findByIdAndUpdate(id, updateData, { new: true });
+  const user = await User.findById(id);
   if (!user) throw new Error('User not found');
-  return user;
+
+  // Handle due amount sync
+  if (updateData.dueAmount !== undefined) {
+    const diff = (user.dueAmount || 0) - Number(updateData.dueAmount);
+    user.price = (user.price || 0) + diff;
+    user.currentPlanPrice = (user.currentPlanPrice || 0) + diff;
+    
+    // Update last payment date if payment was made (due reduced)
+    if (diff > 0) {
+      user.lastPaymentDate = new Date();
+    }
+    
+    user.dueAmount = Number(updateData.dueAmount);
+    
+    // Also update any other fields in updateData
+    Object.keys(updateData).forEach(key => {
+      if (key !== 'dueAmount') {
+        user[key] = updateData[key];
+      }
+    });
+
+    return await user.save();
+  }
+
+  // Generic update if dueAmount is not present
+  Object.assign(user, updateData);
+  return await user.save();
 };
 
 /**
@@ -303,6 +335,7 @@ const getAllUsersForExport = async () => {
       ? calculateDaysLeft(user.plan.endDate)
       : 'N/A',
     'Total Paid': user.price || 0,
+    'Due Amount': user.dueAmount || 0,
     Address: user.address || 'N/A',
     'ID Type': user.idType || 'N/A',
     'ID Number': user.idNumber || 'N/A',
